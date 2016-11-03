@@ -2,8 +2,8 @@
 Changelog for package homer_map_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.4 (2016-11-03)
+------------------
 * updated changelog
 * Contributors: Niklas Yann Wettengel
 
