@@ -7,10 +7,10 @@ MapManagerNode::MapManagerNode(ros::NodeHandle *nh)
 
     int mapSize;
     float resolution;
-    loadConfigValue("/homer_mapping/size", mapSize, (int) 35);
-    loadConfigValue("/homer_mapping/resolution", resolution, (float) 0.05);
-    loadConfigValue("/map_manager/roi_updates", m_roi_polling, (bool) false);
-    loadConfigValue("/map_manager/roi_polling_time", m_roi_polling_time, (float) 0.5);
+	ros::param::param("/homer_mapping/size", mapSize, (int) 35);
+	ros::param::param("/homer_mapping/resolution", resolution, (float) 0.05);
+    ros::param::param("/map_manager/roi_updates", m_roi_polling, (bool) false);
+    ros::param::param("/map_manager/roi_polling_time", m_roi_polling_time, (float) 0.5);
     m_lastROIPoll = ros::Time::now();
     m_MapManager = new MapManager(nh);
     m_POIManager = new PoiManager(nh);
@@ -66,7 +66,7 @@ MapManagerNode::MapManagerNode(ros::NodeHandle *nh)
 
     //load map file from config if present
     std::string mapfile;
-    loadConfigValue("/map_manager/default_mapfile", mapfile);
+	ros::param::get("/map_manager/default_mapfile", mapfile);
     if(mapfile != "")
     {
 		std_msgs::String::Ptr mapfileMsg(new std_msgs::String);

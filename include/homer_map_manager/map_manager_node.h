@@ -28,7 +28,6 @@
 
 #include <homer_map_manager/MapIO/map_saver.h>
 #include <homer_map_manager/MapIO/map_loader.h>
-#include <homer_tools/loadRosConfig.h>
 #include <homer_nav_libs/tools.h>
 
 /** @class MapManagerNode
