@@ -2,6 +2,9 @@
 Changelog for package homer_map_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.7 (2016-11-17)
 ------------------
 
