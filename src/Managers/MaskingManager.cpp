@@ -2,31 +2,40 @@
 
 using namespace std;
 
-MaskingManager::MaskingManager(int mapSize, float resolution)
+MaskingManager::MaskingManager(nav_msgs::MapMetaData mapInfo)
 {
-    m_CellSize = resolution;
-    m_Width = mapSize / m_CellSize + 1;
-    m_Height = mapSize / m_CellSize + 1;
-    ROS_INFO_STREAM( "Creating " << m_Width << " x " << m_Height << " map." );
-    m_MaskingMap.info.resolution = m_CellSize;
-    m_MaskingMap.info.height = m_Height;
-    m_MaskingMap.info.width = m_Width;
-    m_MaskingMap.info.origin.position.x = -m_Height * resolution / 2;
-    m_MaskingMap.info.origin.position.y = -m_Width  * resolution / 2;
-    m_MaskingMap.data.resize(m_Width * m_Height);
+    m_MaskingMap.info = mapInfo;
+    m_MaskingMap.data.resize(m_MaskingMap.info.width * m_MaskingMap.info.height);
     std::fill( m_MaskingMap.data.begin(), m_MaskingMap.data.end(), homer_mapnav_msgs::ModifyMap::NOT_MASKED );
 
-    m_SlamMap.info.resolution = m_CellSize;
-    m_SlamMap.info.height = m_Height;
-    m_SlamMap.info.width = m_Width;
-    m_SlamMap.info.origin.position.x = -m_Height * resolution / 2;
-    m_SlamMap.info.origin.position.y = -m_Width  * resolution / 2;
-    m_SlamMap.data.resize(m_Width * m_Height);
+    m_SlamMap.info = mapInfo;
+    m_SlamMap.data.resize(m_SlamMap.info.width * m_SlamMap.info.height);
     std::fill( m_SlamMap.data.begin(), m_SlamMap.data.end(), homer_mapnav_msgs::ModifyMap::NOT_MASKED );
 }
 
 MaskingManager::~MaskingManager()
 {}
+
+void MaskingManager::updateMapInfo(const nav_msgs::MapMetaData::ConstPtr mapInfo)
+{
+    if(m_SlamMap.info.width != mapInfo.width)
+    {
+        m_SlamMap.info = mapInfo;
+
+        std::vector<int> tmpData =  m_MaskingMap.data;
+    
+        m_MaskingMap.data.resize(mapInfo.width * mapInfo.height);
+        std::fill(m_MaskingMap.data.begin(), m_MaskingMap.data.end(), 0);
+        
+        for(int x = 0; x < )
+        {
+            for(int y = 0;)
+            {
+            }
+        }
+        m_MaskingMap.info = mapInfo; 
+    }
+}
 
 nav_msgs::OccupancyGrid::ConstPtr MaskingManager::modifyMap(homer_mapnav_msgs::ModifyMap::ConstPtr msg)
 {
@@ -69,11 +78,8 @@ void MaskingManager::drawPolygon ( vector< geometry_msgs::Point > vertices , int
     return;
   }
     //make temp. map
-    std::vector<int> data(m_Width * m_Height);
-    for ( int i = 0; i < data.size(); i++ )
-    {
-        data[i] = 0;
-    }
+    std::vector<int> data(m_MaskingMap.info.width * m_MaskingMap.info.height);
+    std::fill (data.begin(), data.end(), 0);
 
   //draw the lines surrounding the polygon
   for ( unsigned int i = 0; i < vertices.size(); i++ )
@@ -153,7 +159,7 @@ void MaskingManager::drawLine ( std::vector<int> &data, int startX, int startY, 
   // compute cells
   for ( t = 0; t < dist; t++ )
   {
-    data[x + m_Width * y] = value;
+    data[x + m_MaskingMap.info.width * y] = value;
 
     xerr += dx;
     yerr += dy;
@@ -173,7 +179,7 @@ void MaskingManager::drawLine ( std::vector<int> &data, int startX, int startY, 
 
 void MaskingManager::fillPolygon ( std::vector<int> &data, int x, int y, int value )
 {
-  int index = x + m_Width * y;
+  int index = x + m_MaskingMap.info.width * y;
   if ( value != data[index] )
   {
     data[index] = value;

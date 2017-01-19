@@ -60,12 +60,6 @@ class MapManager
      * @brief clearMapLayers Clear all map layers
      */
     void clearMapLayers();
-
-    /** getters */
-    double getHeight() { return m_Height; }
-    double getWidth() { return m_Width; }
-    double getResolution() { return m_Resolution; }
-    geometry_msgs::Pose getOrigin() { return m_Origin; }
     
     void updateLaser(int layer, const sensor_msgs::LaserScan::ConstPtr& msg );
 
@@ -94,11 +88,7 @@ class MapManager
     std::map<int, bool> m_MapVisibility;
 
     //sizes of the last slam map
-    double m_Height;
-    double m_Width;
-    double m_Resolution;
     bool m_got_transform;
-    geometry_msgs::Pose m_Origin;
     geometry_msgs::PoseStamped::ConstPtr m_pose;
 	tf::StampedTransform m_sick_transform;
 	tf::StampedTransform m_hokuyo_transform;

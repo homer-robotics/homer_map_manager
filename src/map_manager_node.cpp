@@ -15,7 +15,20 @@ MapManagerNode::MapManagerNode(ros::NodeHandle *nh)
     m_MapManager = new MapManager(nh);
     m_POIManager = new PoiManager(nh);
     m_ROIManager = new RoiManager(nh);
-    m_MaskingManager = new MaskingManager(mapSize, resolution);
+
+    nav_msgs::MapMetaData mapInfo;
+    mapInfo.width = mapSize / resolution;
+    mapInfo.height = mapSize / resolution;
+    mapInfo.resolution = resolution;
+    mapInfo.origin.position.x = 0;
+    mapInfo.origin.position.y = 0; 
+    mapInfo.origin.position.z = 0; 
+    mapInfo.origin.orientation.x = 0; 
+    mapInfo.origin.orientation.y = 0; 
+    mapInfo.origin.orientation.z = 0; 
+    mapInfo.origin.orientation.w = 1; 
+
+    m_MaskingManager = new MaskingManager(mapInfo);
 
     //subscriptions of MapManagerModule
     m_RapidMapSubscriber 		= nh->subscribe("/rapid_mapping/map", 1, &MapManagerNode::callbackRapidMap, this);
@@ -88,6 +101,7 @@ MapManagerNode::~MapManagerNode()
 void MapManagerNode::callbackSLAMMap(const nav_msgs::OccupancyGrid::ConstPtr &msg)
 {
     m_MapManager->updateMapLayer(homer_mapnav_msgs::MapLayers::SLAM_LAYER, msg);
+    m_MaskingManager->updateMapInfo(const nav_msgs::MapMetaData::ConstPtr msg->info);
 }
 
 void MapManagerNode::callbackRapidMap( const nav_msgs::OccupancyGrid::ConstPtr& msg)

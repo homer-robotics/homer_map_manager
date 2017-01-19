@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 
 #include <nav_msgs/OccupancyGrid.h>
+#include <nav_msgs/MapMetaData.h>
 #include <homer_mapnav_msgs/ModifyMap.h>
 
 #include <sstream>
@@ -18,10 +19,12 @@ class MaskingManager
   public:
 
     /** @brief The constructor. */
-    MaskingManager(int mapSize, float resolution);
+    MaskingManager(nav_msgs::MapMetaData mapInfo);
 
     /** @brief The destructor. */
     virtual ~MaskingManager();
+
+    void updateMapInfo(const nav_msgs::MapMetaData::ConstPtr mapInfo);
 
     /** modifies either the masking layer or the slam layer (accordingly to the given map layer in the msg */
     nav_msgs::OccupancyGrid::ConstPtr modifyMap(homer_mapnav_msgs::ModifyMap::ConstPtr msg);
@@ -39,9 +42,6 @@ class MaskingManager
     /** stores the masking values that are afterwards sent to the slam map */
     nav_msgs::OccupancyGrid m_SlamMap;
 
-    /** sizes of the masking map layer */
-    int m_Width, m_Height;
-    float m_CellSize;
 
     /** tools to draw masking polygons */
     void drawPolygon ( std::vector< geometry_msgs::Point > vertices, int value, int mapLayer );
