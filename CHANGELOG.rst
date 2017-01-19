@@ -4,6 +4,12 @@ Changelog for package homer_map_manager
 
 Forthcoming
 -----------
+* cool changelogs
+* dynamic masking map
+* masking manager dynamic map
+* reworking map_manager to use dynamic map sizes
+* Contributors: Florian Polster, Lisa
+
 * dynamic masking map
 * masking manager dynamic map
 * reworking map_manager to use dynamic map sizes
