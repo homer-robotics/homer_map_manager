@@ -2,8 +2,8 @@
 Changelog for package homer_map_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.11 (2017-01-19)
+-------------------
 * cool changelogs
 * dynamic masking map
 * masking manager dynamic map
