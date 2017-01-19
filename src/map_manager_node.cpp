@@ -132,8 +132,9 @@ MapManagerNode::~MapManagerNode() {
 
 void MapManagerNode::callbackSLAMMap(
     const nav_msgs::OccupancyGrid::ConstPtr& msg) {
+    nav_msgs::OccupancyGrid::ConstPtr maskingMap = m_MaskingManager->updateMapInfo(msg->info);
+    m_MapManager->updateMapLayer(homer_mapnav_msgs::MapLayers::MASKING_LAYER, maskingMap);
     m_MapManager->updateMapLayer(homer_mapnav_msgs::MapLayers::SLAM_LAYER, msg);
-    m_MaskingManager->updateMapInfo(msg->info);
 }
 
 void MapManagerNode::callbackRapidMap(

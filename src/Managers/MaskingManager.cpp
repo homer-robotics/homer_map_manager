@@ -17,16 +17,17 @@ MaskingManager::MaskingManager(nav_msgs::MapMetaData mapInfo) {
 
 MaskingManager::~MaskingManager() {}
 
-void MaskingManager::updateMapInfo(const nav_msgs::MapMetaData &mapInfo) {
-    if (m_SlamMap.info.width != mapInfo.width) {
+nav_msgs::OccupancyGrid::ConstPtr MaskingManager::updateMapInfo(const nav_msgs::MapMetaData &mapInfo) {
+    if (m_SlamMap.info.width < mapInfo.width || m_SlamMap.info.height < mapInfo.height) {
         m_SlamMap.info = mapInfo;
 
         int x_add_left =
-            (m_MaskingMap.info.origin.position.x - mapInfo.origin.position.x) /
+            (m_MaskingMap.info.origin.position.x - mapInfo.origin.position.x  + 0.025) /
             mapInfo.resolution;
         int y_add_up =
-            (m_MaskingMap.info.origin.position.y - mapInfo.origin.position.y) /
+            (m_MaskingMap.info.origin.position.y - mapInfo.origin.position.y  + 0.025) /
             mapInfo.resolution;
+        ROS_INFO_STREAM("x add "<<x_add_left<<" y add "<<y_add_up);
 
         std::vector<signed char> tmpData = m_MaskingMap.data;
 
@@ -43,11 +44,13 @@ void MaskingManager::updateMapInfo(const nav_msgs::MapMetaData &mapInfo) {
         }
         m_MaskingMap.info = mapInfo;
     }
+        return boost::make_shared<const ::nav_msgs::OccupancyGrid>(m_MaskingMap);
 }
 
 nav_msgs::OccupancyGrid::ConstPtr MaskingManager::modifyMap(
     homer_mapnav_msgs::ModifyMap::ConstPtr msg) {
     // reset SLAM mask map before each masking
+    m_SlamMap.data.resize(m_SlamMap.info.height * m_SlamMap.info.width);
     std::fill(m_SlamMap.data.begin(), m_SlamMap.data.end(),
               homer_mapnav_msgs::ModifyMap::NOT_MASKED);
     drawPolygon(msg->region, msg->maskAction, msg->mapLayer);

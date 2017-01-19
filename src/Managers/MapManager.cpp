@@ -52,12 +52,6 @@ MapManager::~MapManager()
 
 void MapManager::updateMapLayer(int type, nav_msgs::OccupancyGrid::ConstPtr layer)
 {
-    //TODO possible crash
-    if(m_MapLayers[type]->info.width != layer->info.width)
-    {
-        
-        ROS_INFO_STREAM("Map_manager: map size changed!");
-    }
     m_MapLayers[type] 	= layer;
     if(type == homer_mapnav_msgs::MapLayers::SLAM_LAYER)
     {

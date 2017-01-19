@@ -23,7 +23,7 @@ class MaskingManager {
     /** @brief The destructor. */
     virtual ~MaskingManager();
 
-    void updateMapInfo(const nav_msgs::MapMetaData &mapInfo);
+    nav_msgs::OccupancyGrid::ConstPtr updateMapInfo(const nav_msgs::MapMetaData &mapInfo);
 
     /** modifies either the masking layer or the slam layer (accordingly to the
      * given map layer in the msg */
