@@ -2,6 +2,12 @@
 Changelog for package homer_map_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* map manager crash
+* latching enabled
+* Contributors: Florian Polster, Lisa
+
 0.1.11 (2017-01-19)
 -------------------
 * cool changelogs
