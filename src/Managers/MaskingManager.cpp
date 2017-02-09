@@ -65,8 +65,23 @@ nav_msgs::OccupancyGrid::ConstPtr MaskingManager::modifyMap(
 }
 
 nav_msgs::OccupancyGrid::ConstPtr MaskingManager::resetMap() {
+
+
+    m_MaskingMap.info.width = 1;
+    m_MaskingMap.info.height = 1;
+    m_MaskingMap.info.resolution = 1;
+    m_MaskingMap.info.origin.position.x = 0;
+    m_MaskingMap.info.origin.position.y = 0;
+    m_MaskingMap.data.resize(m_MaskingMap.info.width *
+                             m_MaskingMap.info.height);
     std::fill(m_MaskingMap.data.begin(), m_MaskingMap.data.end(),
               homer_mapnav_msgs::ModifyMap::NOT_MASKED);
+
+    m_SlamMap.info = m_MaskingMap.info;
+    m_SlamMap.data.resize(m_SlamMap.info.width * m_SlamMap.info.height);
+    std::fill(m_SlamMap.data.begin(), m_SlamMap.data.end(),
+              homer_mapnav_msgs::ModifyMap::NOT_MASKED);
+
     nav_msgs::OccupancyGrid::ConstPtr ret =
         boost::make_shared<const ::nav_msgs::OccupancyGrid>(m_MaskingMap);
     return ret;

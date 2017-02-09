@@ -4,10 +4,8 @@
 MapManagerNode::MapManagerNode(ros::NodeHandle* nh) {
     m_LastLaserTime = ros::Time::now();
 
-    int mapSize;
-    float resolution;
-    ros::param::param("/homer_mapping/size", mapSize, (int)35);
-    ros::param::param("/homer_mapping/resolution", resolution, (float)0.05);
+    int mapSize = 1;
+    float resolution = 1;
     ros::param::param("/map_manager/roi_updates", m_roi_polling, (bool)false);
     ros::param::param("/map_manager/roi_polling_time", m_roi_polling_time,
                       (float)0.5);
