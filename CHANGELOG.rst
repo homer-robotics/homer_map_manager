@@ -2,8 +2,8 @@
 Changelog for package homer_map_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.17 (2017-02-26)
+-------------------
 * Eigen3 INCLUDE_DIR fix
 * Contributors: Niklas Yann Wettengel
 
