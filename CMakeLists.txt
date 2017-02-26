@@ -5,6 +5,11 @@ find_package(catkin REQUIRED COMPONENTS roscpp roslib tf homer_mapnav_msgs homer
 
 find_package( Eigen3 REQUIRED )
 
+# eigen 3.2 (wily) only provdies EIGEN3_INCLUDE_DIR, not EIGEN3_INCLUDE_DIRS
+if(NOT EIGEN3_INCLUDE_DIRS)
+  set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
+endif()
+
 set(CMAKE_BUILD_TYPE Release)
 
 find_package(OpenMP)
