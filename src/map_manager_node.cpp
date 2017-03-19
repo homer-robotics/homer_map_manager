@@ -392,7 +392,7 @@ void MapManagerNode::poseCallback(
 
 bool MapManagerNode::saveMapService(homer_mapnav_msgs::SaveMap::Request& req,
                                     homer_mapnav_msgs::SaveMap::Response& res) {
-    // ROS_INFO_STREAM("Saving map "<<req->folder);
+     ROS_INFO_STREAM("Saving map "<<req.folder.data);
     MapGenerator map_saver(std::string(req.folder.data));
     nav_msgs::OccupancyGrid::ConstPtr SLAMMap =
         m_MapManager->getMapLayer(homer_mapnav_msgs::MapLayers::SLAM_LAYER);
