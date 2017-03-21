@@ -29,21 +29,22 @@
 
 /* Author: Brian Gerkey */
 
-#define USAGE "\nUSAGE: map_server <map.yaml>\n" \
-              "  map.yaml: map description file\n" \
-              "DEPRECATED USAGE: map_server <map> <resolution>\n" \
-              "  map: image file to load\n"\
-              "  resolution: map resolution [meters/pixel]"
+#define USAGE                                                                  \
+  "\nUSAGE: map_server <map.yaml>\n"                                           \
+  "  map.yaml: map description file\n"                                         \
+  "DEPRECATED USAGE: map_server <map> <resolution>\n"                          \
+  "  map: image file to load\n"                                                \
+  "  resolution: map resolution [meters/pixel]"
 
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <libgen.h>
 #include <fstream>
 
-#include "ros/ros.h"
-#include "ros/console.h"
 #include <homer_map_manager/MapIO/image_loader.h>
 #include <nav_msgs/OccupancyGrid.h>
+#include "ros/console.h"
+#include "ros/ros.h"
 #include "yaml-cpp/yaml.h"
 
 #include <homer_mapnav_msgs/PointOfInterest.h>
@@ -51,29 +52,25 @@
 
 class MapServer
 {
-  public:
-    /** Trivial constructor */
-    MapServer(const std::string fname, bool &success);
+public:
+  /** Trivial constructor */
+  MapServer(const std::string fname, bool &success);
 
-    nav_msgs::OccupancyGrid getSLAMMap();
+  nav_msgs::OccupancyGrid getSLAMMap();
 
-    nav_msgs::OccupancyGrid getMaskingMap();
+  nav_msgs::OccupancyGrid getMaskingMap();
 
-    std::vector<homer_mapnav_msgs::PointOfInterest> getPois();
+  std::vector<homer_mapnav_msgs::PointOfInterest> getPois();
 
-    std::vector<homer_mapnav_msgs::RegionOfInterest> getRois();
+  std::vector<homer_mapnav_msgs::RegionOfInterest> getRois();
 
-  
-  private:
+private:
+  /** The map data is cached here
+   */
+  nav_msgs::GetMap::Response map_resp_;
+  nav_msgs::OccupancyGrid m_SLAMMap;
+  nav_msgs::OccupancyGrid m_MaskingMap;
 
-    /** The map data is cached here
-     */
-    nav_msgs::GetMap::Response map_resp_;
-    nav_msgs::OccupancyGrid m_SLAMMap;
-    nav_msgs::OccupancyGrid m_MaskingMap;
-
-
-    std::vector<homer_mapnav_msgs::PointOfInterest> poiList;
-    std::vector<homer_mapnav_msgs::RegionOfInterest> roiList;
-
+  std::vector<homer_mapnav_msgs::PointOfInterest> poiList;
+  std::vector<homer_mapnav_msgs::RegionOfInterest> roiList;
 };
