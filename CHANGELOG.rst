@@ -2,6 +2,17 @@
 Changelog for package homer_map_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* autoformat
+* typo
+* send merged map on masking update
+* ClangFormat
+* Clang Format
+* when map was loaded transform wasn't fetched -> fixed
+* removed unused parameter - added info output - changed to simpler interface
+* Contributors: Florian Polster, Lisa, Niklas Yann Wettengel
+
 0.1.19 (2017-03-02)
 -------------------
 
