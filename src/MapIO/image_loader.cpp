@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2008, Willow Garage, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Willow Garage, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,15 +29,15 @@
 
 /*
  * This file contains helper functions for loading images as maps.
- * 
+ *
  * Author: Brian Gerkey
  */
 
 #include <cstring>
 #include <stdexcept>
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 // We use SDL_image to load the image from disk
 #include <SDL/SDL_image.h>
@@ -50,28 +50,26 @@
 
 namespace map_server
 {
-
-void
-loadMapFromFile(nav_msgs::OccupancyGrid* map,
-                const char* fname, double res, bool negate,
-                double occ_th, double free_th, double* origin)
+void loadMapFromFile(nav_msgs::OccupancyGrid* map, const char* fname,
+                     double res, bool negate, double occ_th, double free_th,
+                     double* origin)
 {
   SDL_Surface* img;
 
   unsigned char* pixels;
   unsigned char* p;
   int rowstride, n_channels;
-  unsigned int i,j;
+  unsigned int i, j;
   int k;
   double occ;
   int color_sum;
   double color_avg;
 
   // Load the image using SDL.  If we get NULL back, the image load failed.
-  if(!(img = IMG_Load(fname)))
+  if (!(img = IMG_Load(fname)))
   {
-    std::string errmsg = std::string("failed to open image file \"") + 
-            std::string(fname) + std::string("\"");
+    std::string errmsg = std::string("failed to open image file \"") +
+                         std::string(fname) + std::string("\"");
     throw std::runtime_error(errmsg);
   }
 
@@ -80,10 +78,10 @@ loadMapFromFile(nav_msgs::OccupancyGrid* map,
   map->info.height = img->h;
   map->info.resolution = res;
   map->info.origin.position.x = *(origin);
-  map->info.origin.position.y = *(origin+1);
+  map->info.origin.position.y = *(origin + 1);
   map->info.origin.position.z = 0.0;
   tf::Quaternion q;
-  q.setRPY(0,0, *(origin+2));
+  q.setRPY(0, 0, *(origin + 2));
   map->info.origin.orientation.x = q.x();
   map->info.origin.orientation.y = q.y();
   map->info.origin.orientation.z = q.z();
@@ -98,37 +96,36 @@ loadMapFromFile(nav_msgs::OccupancyGrid* map,
 
   // Copy pixel data into the map structure
   pixels = (unsigned char*)(img->pixels);
-  for(j = 0; j < map->info.height; j++)
+  for (j = 0; j < map->info.height; j++)
   {
     for (i = 0; i < map->info.width; i++)
     {
       // Compute mean of RGB for this pixel
-      p = pixels + j*rowstride + i*n_channels;
+      p = pixels + j * rowstride + i * n_channels;
       color_sum = 0;
-      for(k=0;k<n_channels;k++)
+      for (k = 0; k < n_channels; k++)
         color_sum += *(p + (k));
       color_avg = color_sum / (double)n_channels;
 
       // If negate is true, we consider blacker pixels free, and whiter
       // pixels free.  Otherwise, it's vice versa.
-      if(negate)
+      if (negate)
         occ = color_avg / 255.0;
       else
         occ = (255 - color_avg) / 255.0;
-      
+
       // Apply thresholds to RGB means to determine occupancy values for
       // map.  Note that we invert the graphics-ordering of the pixels to
       // produce a map with cell (0,0) in the lower-left corner.
-      if(occ > occ_th)
-        map->data[MAP_IDX(map->info.width,i,map->info.height - j - 1)] = 99;
-      else if(occ < free_th)
-        map->data[MAP_IDX(map->info.width,i,map->info.height - j - 1)] = 0;
+      if (occ > occ_th)
+        map->data[MAP_IDX(map->info.width, i, map->info.height - j - 1)] = 99;
+      else if (occ < free_th)
+        map->data[MAP_IDX(map->info.width, i, map->info.height - j - 1)] = 0;
       else
-        map->data[MAP_IDX(map->info.width,i,map->info.height - j - 1)] = -1;
+        map->data[MAP_IDX(map->info.width, i, map->info.height - j - 1)] = -1;
     }
   }
 
   SDL_FreeSurface(img);
 }
-
 }

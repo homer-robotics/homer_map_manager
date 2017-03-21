@@ -2,10 +2,10 @@
  * map_saver
  * Copyright (c) 2008, Willow Garage, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the <ORGANIZATION> nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,9 +29,9 @@
  */
 
 #include <cstdio>
-#include "ros/ros.h"
-#include "ros/console.h"
 #include "nav_msgs/GetMap.h"
+#include "ros/console.h"
+#include "ros/ros.h"
 //#include "LinearMath/btMatrix3x3.h"
 #include "geometry_msgs/Quaternion.h"
 
@@ -39,27 +39,23 @@
 #include <homer_mapnav_msgs/RegionOfInterest.h>
 
 using namespace std;
- 
+
 /**
  * @brief Map generation node.
  */
-class MapGenerator 
+class MapGenerator
 {
+public:
+  MapGenerator(const std::string mapname);
 
-  public:
-    MapGenerator(const std::string mapname);
+  void save(const nav_msgs::OccupancyGridConstPtr& SLAMMap,
+            const nav_msgs::OccupancyGridConstPtr& maskingMap,
+            std::vector<homer_mapnav_msgs::PointOfInterest> poiList,
+            std::vector<homer_mapnav_msgs::RegionOfInterest> roiList);
 
-    void save(const nav_msgs::OccupancyGridConstPtr& SLAMMap,
-              const nav_msgs::OccupancyGridConstPtr& maskingMap,
-              std::vector<homer_mapnav_msgs::PointOfInterest> poiList,
-              std::vector<homer_mapnav_msgs::RegionOfInterest> roiList );
+private:
+  std::string m_Mapname;
 
-  private:
-    std::string m_Mapname;
-
-    void saveMapLayer(const nav_msgs::OccupancyGridConstPtr& map, std::string fileName);
-
+  void saveMapLayer(const nav_msgs::OccupancyGridConstPtr& map,
+                    std::string fileName);
 };
-
-
-
