@@ -2,8 +2,8 @@
 Changelog for package homer_map_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.21 (2017-03-21)
+-------------------
 * autoformat
 * typo
 * send merged map on masking update
