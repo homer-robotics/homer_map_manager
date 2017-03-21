@@ -3,7 +3,7 @@
 
 MapManager::MapManager(ros::NodeHandle *nh)
 {
-  m_Mapnublisher = nh->advertise<nav_msgs::OccupancyGrid>("/map", 1, true);
+  m_MapPublisher = nh->advertise<nav_msgs::OccupancyGrid>("/map", 1, true);
 
   m_map_layers.push_back(homer_mapnav_msgs::MapLayers::SLAM_LAYER);
   m_map_layers.push_back(homer_mapnav_msgs::MapLayers::KINECT_LAYER);
