@@ -29,154 +29,173 @@
 
 /* Author: Brian Gerkey */
 
-
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <libgen.h>
 #include <fstream>
 
-#include "ros/ros.h"
-#include "ros/console.h"
 #include <homer_map_manager/MapIO/image_loader.h>
 #include "nav_msgs/MapMetaData.h"
-#include "yaml-cpp/yaml.h"
+#include "ros/console.h"
+#include "ros/ros.h"
 #include "tf/transform_datatypes.h"
+#include "yaml-cpp/yaml.h"
 
 #include <homer_map_manager/MapIO/map_loader.h>
 
 /** Trivial constructor */
-MapServer::MapServer(const std::string fname, bool &success)
+MapServer::MapServer(const std::string fname, bool& success)
 {
-	success = false;
-	std::string slammapfname = "";
-	std::string maskingmapfname = "";
-	double origin[3];
-	int negate;
-	double res, occ_th, free_th;
-	std::string frame_id;
-	frame_id = "map";
-	//mapfname = fname + ".pgm";
-	//std::ifstream fin((fname + ".yaml").c_str());
-	std::ifstream fin(fname.c_str());
-	if (fin.fail()) {
-		ROS_ERROR("Map_server could not open %s.", fname.c_str());
-		return;
-	}
+  success = false;
+  std::string slammapfname = "";
+  std::string maskingmapfname = "";
+  double origin[3];
+  int negate;
+  double res, occ_th, free_th;
+  std::string frame_id;
+  frame_id = "map";
+  // mapfname = fname + ".pgm";
+  // std::ifstream fin((fname + ".yaml").c_str());
+  std::ifstream fin(fname.c_str());
+  if (fin.fail())
+  {
+    ROS_ERROR("Map_server could not open %s.", fname.c_str());
+    return;
+  }
 
-	YAML::Node doc = YAML::LoadFile(fname);
+  YAML::Node doc = YAML::LoadFile(fname);
 
-	try { 
-		res = doc["resolution"].as<double>();
-	} catch (YAML::InvalidScalar) { 
-		ROS_ERROR("The map does not contain a resolution tag or it is invalid.");
-		return;
-	}
-	try { 
-		negate = doc["negate"].as<int>(); 
-	} catch (YAML::InvalidScalar) { 
-		ROS_ERROR("The map does not contain a negate tag or it is invalid.");
-		return;
-	}
-	try { 
-		occ_th = doc["occupied_thresh"].as<double>(); 
-	} catch (YAML::InvalidScalar) { 
-		ROS_ERROR("The map does not contain an occupied_thresh tag or it is invalid.");
-		return;
-	}
-	try { 
-		free_th = doc["free_thresh"].as<double>(); 
-	} catch (YAML::InvalidScalar) { 
-		ROS_ERROR("The map does not contain a free_thresh tag or it is invalid.");
-		return;
-	}
-	try { 
-		origin[0] = doc["origin"][0].as<double>(); 
-		origin[1] = doc["origin"][1].as<double>(); 
-		origin[2] = doc["origin"][2].as<double>(); 
-	} catch (YAML::InvalidScalar) { 
-		ROS_ERROR("The map does not contain an origin tag or it is invalid.");
-		return;
-	}
-	try {
-		slammapfname = doc["image"].as<std::string>();
-		// TODO: make this path-handling more robust
-		if(slammapfname.size() == 0)
-		{
-			ROS_ERROR("The image tag cannot be an empty string.");
-			return;
-		}
-		if(slammapfname[0] != '/')
-		{
-			// dirname can modify what you pass it
-			char* fname_copy = strdup(fname.c_str());
-			slammapfname = std::string(dirname(fname_copy)) + '/' + slammapfname;
-			free(fname_copy);
-		}
-	} catch (YAML::InvalidScalar) { 
-		ROS_ERROR("The map does not contain an image tag or it is invalid.");
-		return;
-	}
-	//get masking map image path if available
-	if(doc["mask_image"])
-	{
-		maskingmapfname = doc["mask_image"].as<std::string>();
-		// TODO: make this path-handling more robust
-		if(maskingmapfname.size() == 0)
-		{
-			ROS_ERROR("The image tag cannot be an empty string.");
-			return;
-		}
-		if(maskingmapfname[0] != '/')
-		{
-			//              // dirname can modify what you pass it
-			char* fname_copy = strdup(fname.c_str());
-			maskingmapfname = std::string(dirname(fname_copy)) + '/' + maskingmapfname;
-			free(fname_copy);
-		}
-	}
+  try
+  {
+    res = doc["resolution"].as<double>();
+  }
+  catch (YAML::InvalidScalar)
+  {
+    ROS_ERROR("The map does not contain a resolution tag or it is invalid.");
+    return;
+  }
+  try
+  {
+    negate = doc["negate"].as<int>();
+  }
+  catch (YAML::InvalidScalar)
+  {
+    ROS_ERROR("The map does not contain a negate tag or it is invalid.");
+    return;
+  }
+  try
+  {
+    occ_th = doc["occupied_thresh"].as<double>();
+  }
+  catch (YAML::InvalidScalar)
+  {
+    ROS_ERROR("The map does not contain an occupied_thresh tag or it is "
+              "invalid.");
+    return;
+  }
+  try
+  {
+    free_th = doc["free_thresh"].as<double>();
+  }
+  catch (YAML::InvalidScalar)
+  {
+    ROS_ERROR("The map does not contain a free_thresh tag or it is invalid.");
+    return;
+  }
+  try
+  {
+    origin[0] = doc["origin"][0].as<double>();
+    origin[1] = doc["origin"][1].as<double>();
+    origin[2] = doc["origin"][2].as<double>();
+  }
+  catch (YAML::InvalidScalar)
+  {
+    ROS_ERROR("The map does not contain an origin tag or it is invalid.");
+    return;
+  }
+  try
+  {
+    slammapfname = doc["image"].as<std::string>();
+    // TODO: make this path-handling more robust
+    if (slammapfname.size() == 0)
+    {
+      ROS_ERROR("The image tag cannot be an empty string.");
+      return;
+    }
+    if (slammapfname[0] != '/')
+    {
+      // dirname can modify what you pass it
+      char* fname_copy = strdup(fname.c_str());
+      slammapfname = std::string(dirname(fname_copy)) + '/' + slammapfname;
+      free(fname_copy);
+    }
+  }
+  catch (YAML::InvalidScalar)
+  {
+    ROS_ERROR("The map does not contain an image tag or it is invalid.");
+    return;
+  }
+  // get masking map image path if available
+  if (doc["mask_image"])
+  {
+    maskingmapfname = doc["mask_image"].as<std::string>();
+    // TODO: make this path-handling more robust
+    if (maskingmapfname.size() == 0)
+    {
+      ROS_ERROR("The image tag cannot be an empty string.");
+      return;
+    }
+    if (maskingmapfname[0] != '/')
+    {
+      //              // dirname can modify what you pass it
+      char* fname_copy = strdup(fname.c_str());
+      maskingmapfname =
+          std::string(dirname(fname_copy)) + '/' + maskingmapfname;
+      free(fname_copy);
+    }
+  }
 
-	//get POIs if existent
-	if(doc["pois"])
-	{
-		ROS_INFO_STREAM("Found "  << doc["pois"].size() << " pois");
-		for(size_t i = 0; i < doc["pois"].size(); ++i)
-		{
+  // get POIs if existent
+  if (doc["pois"])
+  {
+    ROS_INFO_STREAM("Found " << doc["pois"].size() << " pois");
+    for (size_t i = 0; i < doc["pois"].size(); ++i)
+    {
       ROS_INFO_STREAM("load one poi." << i);
-			std::string name;
-			int type;
-			float posX;
-			float posY;
-			float theta;
-			std::string remarks;
-			name = doc["pois"][i]["name"].as<std::string>() ;
-			type = doc["pois"][i]["type"].as<int>() ;
-			posX = doc["pois"][i]["x"].as<double>() ;
-			posY = doc["pois"][i]["y"].as<double>() ;
-			theta =	doc["pois"][i]["theta"].as<double>() ;
-            remarks = doc["pois"][i]["remarks"].as<std::string>("");
+      std::string name;
+      int type;
+      float posX;
+      float posY;
+      float theta;
+      std::string remarks;
+      name = doc["pois"][i]["name"].as<std::string>();
+      type = doc["pois"][i]["type"].as<int>();
+      posX = doc["pois"][i]["x"].as<double>();
+      posY = doc["pois"][i]["y"].as<double>();
+      theta = doc["pois"][i]["theta"].as<double>();
+      remarks = doc["pois"][i]["remarks"].as<std::string>("");
 
-			homer_mapnav_msgs::PointOfInterest poi;
-			poi.name = name;
-			poi.type = type;
-			poi.pose.position.x = posX;
-			poi.pose.position.y = posY;
-			poi.pose.position.z = 0.0;
-			poi.pose.orientation = tf::createQuaternionMsgFromYaw(theta);
-			poi.remarks = remarks;
+      homer_mapnav_msgs::PointOfInterest poi;
+      poi.name = name;
+      poi.type = type;
+      poi.pose.position.x = posX;
+      poi.pose.position.y = posY;
+      poi.pose.position.z = 0.0;
+      poi.pose.orientation = tf::createQuaternionMsgFromYaw(theta);
+      poi.remarks = remarks;
       ROS_INFO_STREAM("Done, Saving in mapnav_msgs");
 
-			poiList.push_back(poi);
+      poiList.push_back(poi);
       ROS_INFO_STREAM("loaded one poi");
     }
     ROS_INFO_STREAM("Done. Loaded all POIs.");
   }
 
-
-  //get ROIs if existent
-  if(doc["rois"])
+  // get ROIs if existent
+  if (doc["rois"])
   {
-    ROS_INFO_STREAM("Found "  << doc["rois"].size() << " rois");
-    for(size_t i = 0; i < doc["rois"].size(); ++i)
+    ROS_INFO_STREAM("Found " << doc["rois"].size() << " rois");
+    for (size_t i = 0; i < doc["rois"].size(); ++i)
     {
       std::string name;
       int type;
@@ -192,18 +211,18 @@ MapServer::MapServer(const std::string fname, bool &success)
       std::string remarks;
 
       // Read from file
-      name = doc["rois"][i]["name"].as<std::string>() ;
-      type = doc["rois"][i]["type"].as<int>() ;
-      posX1 = doc["rois"][i]["x1"].as<double>() ;
-      posY1 = doc["rois"][i]["y1"].as<double>() ;
-      posX2 = doc["rois"][i]["x2"].as<double>() ;
-      posY2 = doc["rois"][i]["y2"].as<double>() ;
-      posX3 = doc["rois"][i]["x3"].as<double>() ;
-      posY3 = doc["rois"][i]["y3"].as<double>() ;
-      posX4 = doc["rois"][i]["x4"].as<double>() ;
-      posY4 = doc["rois"][i]["y4"].as<double>() ;
-      id = doc["rois"][i]["id"].as<int>() ;
-      remarks = doc["rois"][i]["remarks"].as<std::string>("-") ;
+      name = doc["rois"][i]["name"].as<std::string>();
+      type = doc["rois"][i]["type"].as<int>();
+      posX1 = doc["rois"][i]["x1"].as<double>();
+      posY1 = doc["rois"][i]["y1"].as<double>();
+      posX2 = doc["rois"][i]["x2"].as<double>();
+      posY2 = doc["rois"][i]["y2"].as<double>();
+      posX3 = doc["rois"][i]["x3"].as<double>();
+      posY3 = doc["rois"][i]["y3"].as<double>();
+      posX4 = doc["rois"][i]["x4"].as<double>();
+      posY4 = doc["rois"][i]["y4"].as<double>();
+      id = doc["rois"][i]["id"].as<int>();
+      remarks = doc["rois"][i]["remarks"].as<std::string>("-");
 
       // save in roi-type
       homer_mapnav_msgs::RegionOfInterest roi;
@@ -228,48 +247,46 @@ MapServer::MapServer(const std::string fname, bool &success)
     }
   }
 
-	ROS_INFO("Loading SLAM map from image \"%s\"", slammapfname.c_str());
-	map_server::loadMapFromFile(&m_SLAMMap,slammapfname.c_str(),res,negate,occ_th,free_th, origin);
-	m_SLAMMap.info.map_load_time = ros::Time::now();
-	m_SLAMMap.header.frame_id = frame_id;
-	m_SLAMMap.header.stamp = ros::Time::now();
-	ROS_INFO("Read a %d X %d SLAM map @ %.3lf m/cell",
-			m_SLAMMap.info.width,
-			m_SLAMMap.info.height,
-			m_SLAMMap.info.resolution);
+  ROS_INFO("Loading SLAM map from image \"%s\"", slammapfname.c_str());
+  map_server::loadMapFromFile(&m_SLAMMap, slammapfname.c_str(), res, negate,
+                              occ_th, free_th, origin);
+  m_SLAMMap.info.map_load_time = ros::Time::now();
+  m_SLAMMap.header.frame_id = frame_id;
+  m_SLAMMap.header.stamp = ros::Time::now();
+  ROS_INFO("Read a %d X %d SLAM map @ %.3lf m/cell", m_SLAMMap.info.width,
+           m_SLAMMap.info.height, m_SLAMMap.info.resolution);
 
-	if(maskingmapfname != "")
-	{
-		ROS_INFO("Loading masking map from image \"%s\"", maskingmapfname.c_str());
-		map_server::loadMapFromFile(&m_MaskingMap,maskingmapfname.c_str(),res,negate,occ_th,free_th, origin);
-		m_MaskingMap.info.map_load_time = ros::Time::now();
-		m_MaskingMap.header.frame_id = frame_id;
-		m_MaskingMap.header.stamp = ros::Time::now();
-		ROS_INFO("Read a %d X %d masking map @ %.3lf m/cell",
-				m_MaskingMap.info.width,
-				m_MaskingMap.info.height,
-				m_MaskingMap.info.resolution);
-	}
-	success = true;
+  if (maskingmapfname != "")
+  {
+    ROS_INFO("Loading masking map from image \"%s\"", maskingmapfname.c_str());
+    map_server::loadMapFromFile(&m_MaskingMap, maskingmapfname.c_str(), res,
+                                negate, occ_th, free_th, origin);
+    m_MaskingMap.info.map_load_time = ros::Time::now();
+    m_MaskingMap.header.frame_id = frame_id;
+    m_MaskingMap.header.stamp = ros::Time::now();
+    ROS_INFO("Read a %d X %d masking map @ %.3lf m/cell",
+             m_MaskingMap.info.width, m_MaskingMap.info.height,
+             m_MaskingMap.info.resolution);
+  }
+  success = true;
 }
 
 nav_msgs::OccupancyGrid MapServer::getSLAMMap()
 {
-	return m_SLAMMap;
+  return m_SLAMMap;
 }
 
 nav_msgs::OccupancyGrid MapServer::getMaskingMap()
 {
-	return m_MaskingMap;
+  return m_MaskingMap;
 }
 
 std::vector<homer_mapnav_msgs::PointOfInterest> MapServer::getPois()
 {
-	return poiList;
+  return poiList;
 }
 
 std::vector<homer_mapnav_msgs::RegionOfInterest> MapServer::getRois()
 {
   return roiList;
 }
-
