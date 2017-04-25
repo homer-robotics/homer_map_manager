@@ -7,14 +7,14 @@
 #include <map>
 #include <sstream>
 #include <string>
-#include <string>
 #include <vector>
+
+#include <homer_map_manager/Managers/MaskingManager.h>
 
 #include <geometry_msgs/Pose.h>
 #include <homer_mapnav_msgs/MapLayers.h>
 #include <homer_mapnav_msgs/ModifyMap.h>
 #include <homer_nav_libs/tools.h>
-#include <nav_msgs/OccupancyGrid.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <sensor_msgs/LaserScan.h>
 #include <tf/tf.h>
@@ -61,14 +61,12 @@ public:
    */
   void clearMapLayers();
 
-  void updateLaser(int layer, const sensor_msgs::LaserScan::ConstPtr& msg);
-
   /** merges all map layers and publishes the merged map */
   void sendMergedMap();
 
-  void updatePose(const geometry_msgs::PoseStamped::ConstPtr& msg)
+  void updateMaskingManager(MaskingManager* maskingManager)
   {
-    m_pose = msg;
+    m_MaskingManager = maskingManager;
   }
 
   /** destructor */
@@ -81,9 +79,6 @@ private:
   std::map<int, nav_msgs::OccupancyGrid::ConstPtr> m_MapLayers;
   std::map<int, sensor_msgs::LaserScan::ConstPtr> m_laserLayers;
   std::vector<int> m_map_layers;
-  std::vector<int> m_laser_layers;
-
-  tf::TransformListener m_TransformListener;
 
   /**
    * This map stores which map layers are enabled and which are disabled
@@ -92,9 +87,8 @@ private:
 
   // sizes of the last slam map
   bool m_got_transform;
-  geometry_msgs::PoseStamped::ConstPtr m_pose;
-  tf::StampedTransform m_sick_transform;
-  tf::StampedTransform m_hokuyo_transform;
+
+  MaskingManager* m_MaskingManager;
 
   /** map publisher */
   ros::Publisher m_MapPublisher;

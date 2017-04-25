@@ -33,7 +33,13 @@ MaskingManager::updateMapInfo(const nav_msgs::MapMetaData &mapInfo)
     int y_add_up = (m_MaskingMap.info.origin.position.y -
                     mapInfo.origin.position.y + 0.025) /
                    mapInfo.resolution;
-    ROS_INFO_STREAM("x add " << x_add_left << " y add " << y_add_up);
+    ROS_DEBUG_STREAM("x add " << x_add_left << " y add " << y_add_up);
+
+    for(mapPoint& mp : m_modified_points)
+    {
+       mp.x += x_add_left;
+       mp.y += y_add_up;
+    }
 
     std::vector<signed char> tmpData = m_MaskingMap.data;
 
@@ -73,6 +79,24 @@ MaskingManager::modifyMap(homer_mapnav_msgs::ModifyMap::ConstPtr msg)
   {
     ret = boost::make_shared<const ::nav_msgs::OccupancyGrid>(m_MaskingMap);
   }
+  
+  m_modified_points.clear();
+  for(int x = 0; x < m_MaskingMap.info.width; x++)
+  {
+      for(int y = 0; y < m_MaskingMap.info.height; y++)
+      {
+          int index = y * m_MaskingMap.info.width + x;
+          if(m_MaskingMap.data[index] != homer_mapnav_msgs::ModifyMap::NOT_MASKED)
+          {
+            mapPoint tmp;
+            tmp.x = x; 
+            tmp.y = y;
+            tmp.value = m_MaskingMap.data[index];
+            m_modified_points.push_back(tmp);
+          }
+      }
+  }
+
   return ret;
 }
 
@@ -94,6 +118,7 @@ nav_msgs::OccupancyGrid::ConstPtr MaskingManager::resetMap()
 
   nav_msgs::OccupancyGrid::ConstPtr ret =
       boost::make_shared<const ::nav_msgs::OccupancyGrid>(m_MaskingMap);
+  m_modified_points.clear();
   return ret;
 }
 
@@ -104,6 +129,37 @@ void MaskingManager::replaceMap(nav_msgs::OccupancyGrid map)
   else
     std::fill(m_MaskingMap.data.begin(), m_MaskingMap.data.end(),
               homer_mapnav_msgs::ModifyMap::NOT_MASKED);
+  m_modified_points.clear();
+  for(int x = 0; x < m_MaskingMap.info.width; x++)
+  {
+      for(int y = 0; y < m_MaskingMap.info.height; y++)
+      {
+          int index = y * m_MaskingMap.info.width + x;
+          if(m_MaskingMap.data[index] != homer_mapnav_msgs::ModifyMap::NOT_MASKED)
+          {
+            mapPoint tmp;
+            tmp.x = x; 
+            tmp.y = y;
+            tmp.value = m_MaskingMap.data[index];
+            m_modified_points.push_back(tmp);
+          }
+      }
+  }
+}
+
+void MaskingManager::applyMasking(nav_msgs::OccupancyGrid& map)
+{
+    for(mapPoint& mp : m_modified_points)
+    {
+        if(mp.x >= 0 && mp.x < map.info.width) 
+        {
+            if(mp.y >= 0 && mp.y < map.info.height)
+            {
+                int index = mp.y * map.info.width + mp.x;
+                map.data[index] = mp.value;
+            }
+        }
+    }
 }
 
 void MaskingManager::drawPolygon(vector<geometry_msgs::Point> vertices,

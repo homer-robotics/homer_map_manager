@@ -29,6 +29,8 @@ MapManagerNode::MapManagerNode(ros::NodeHandle* nh)
 
   m_MaskingManager = new MaskingManager(mapInfo);
 
+  m_MapManager->updateMaskingManager(m_MaskingManager);
+
   // subscriptions of MapManagerModule
   m_RapidMapSubscriber = nh->subscribe("/rapid_mapping/map", 1,
                                        &MapManagerNode::callbackRapidMap, this);
@@ -43,12 +45,6 @@ MapManagerNode::MapManagerNode(ros::NodeHandle* nh)
   m_MapVisibilitySubscriber =
       nh->subscribe("/map_manager/toggle_map_visibility", 1,
                     &MapManagerNode::callbackMapVisibility, this);
-  m_LaserScanSubscriber =
-      nh->subscribe("/scan", 1, &MapManagerNode::callbackLaserScan, this);
-  m_BackLaserScanSubscriber =
-      nh->subscribe("/back_scan", 1, &MapManagerNode::callbackBackLaser, this);
-  m_FrontLaserScanSubscriber = nh->subscribe(
-      "/front_scan", 1, &MapManagerNode::callbackFrontLaser, this);
   m_PoseSubscriber =
       nh->subscribe("/pose", 1, &MapManagerNode::poseCallback, this);
 
@@ -333,24 +329,6 @@ void MapManagerNode::callbackResetMaps(const std_msgs::Empty::ConstPtr& msg)
                                maskingMap);
 }
 
-void MapManagerNode::callbackLaserScan(
-    const sensor_msgs::LaserScan::ConstPtr& msg)
-{
-  m_MapManager->updateLaser(homer_mapnav_msgs::MapLayers::SICK_LAYER, msg);
-}
-
-void MapManagerNode::callbackBackLaser(
-    const sensor_msgs::LaserScan::ConstPtr& msg)
-{
-  m_MapManager->updateLaser(homer_mapnav_msgs::MapLayers::HOKUYO_BACK, msg);
-}
-
-void MapManagerNode::callbackFrontLaser(
-    const sensor_msgs::LaserScan::ConstPtr& msg)
-{
-  m_MapManager->updateLaser(homer_mapnav_msgs::MapLayers::HOKUYO_FRONT, msg);
-}
-
 bool MapManagerNode::getPOIsService(
     homer_mapnav_msgs::GetPointsOfInterest::Request& req,
     homer_mapnav_msgs::GetPointsOfInterest::Response& res)
@@ -386,7 +364,7 @@ bool MapManagerNode::getROINameService(
 void MapManagerNode::poseCallback(
     const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
-  m_MapManager->updatePose(msg);
+  //m_MapManager->updatePose(msg);
   if (msg->header.stamp - m_lastROIPoll > ros::Duration(m_roi_polling_time) &&
       m_roi_polling)
   {
