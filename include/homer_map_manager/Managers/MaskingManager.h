@@ -38,6 +38,8 @@ public:
   /** replaces the masking map layer */
   void replaceMap(nav_msgs::OccupancyGrid map);
 
+  void applyMasking(nav_msgs::OccupancyGrid& map);
+
 private:
   /** stores the masking values in the dedicated masking map */
   nav_msgs::OccupancyGrid m_MaskingMap;
@@ -50,6 +52,15 @@ private:
   void drawLine(std::vector<int> &data, int startX, int startY, int endX,
                 int endY, int value);
   void fillPolygon(std::vector<int> &data, int x, int y, int value);
+
+  struct mapPoint{
+  int x = 0;
+  int y = 0;
+  char value = homer_mapnav_msgs::ModifyMap::BLOCKED;
+  };
+
+  std::vector<mapPoint> m_modified_points;
+
 };
 
 #endif

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(homer_map_manager)
+set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS roscpp roslib tf homer_mapnav_msgs homer_nav_libs cmake_modules std_srvs)
 

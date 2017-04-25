@@ -24,7 +24,7 @@
 #include "std_msgs/Empty.h"
 #include "std_msgs/Int32.h"
 #include "std_msgs/String.h"
-#include "std_srvs/Empty.h"
+#include <std_srvs/Empty.h>
 
 #include <homer_map_manager/MapIO/map_loader.h>
 #include <homer_map_manager/MapIO/map_saver.h>
@@ -50,11 +50,6 @@ private:
   void callbackLoadMap(const std_msgs::String::ConstPtr& msg);
   void callbackMapVisibility(const homer_mapnav_msgs::MapLayers::ConstPtr& msg);
   void callbackResetMaps(const std_msgs::Empty::ConstPtr& msg);
-
-  /** laser scan callback */
-  void callbackLaserScan(const sensor_msgs::LaserScan::ConstPtr& msg);
-  void callbackBackLaser(const sensor_msgs::LaserScan::ConstPtr& msg);
-  void callbackFrontLaser(const sensor_msgs::LaserScan::ConstPtr& msg);
 
   /** callbacks of PointOfInterestManagerModule */
   void callbackAddPOI(const homer_mapnav_msgs::PointOfInterest::ConstPtr& msg);
@@ -116,9 +111,6 @@ private:
   ros::Subscriber m_SaveMapSubscriber;
   ros::Subscriber m_LoadMapSubscriber;
   ros::Subscriber m_MapVisibilitySubscriber;
-  ros::Subscriber m_LaserScanSubscriber;
-  ros::Subscriber m_BackLaserScanSubscriber;
-  ros::Subscriber m_FrontLaserScanSubscriber;
 
   // subscriptions of PointOfInterestManagerModule
   ros::Subscriber m_AddPOISubscriber;
