@@ -92,6 +92,7 @@ MaskingManager::modifyMap(homer_mapnav_msgs::ModifyMap::ConstPtr msg)
             tmp.x = x; 
             tmp.y = y;
             tmp.value = m_MaskingMap.data[index];
+            m_modified_points.push_back(tmp);
           }
       }
   }
@@ -129,6 +130,21 @@ void MaskingManager::replaceMap(nav_msgs::OccupancyGrid map)
     std::fill(m_MaskingMap.data.begin(), m_MaskingMap.data.end(),
               homer_mapnav_msgs::ModifyMap::NOT_MASKED);
   m_modified_points.clear();
+  for(int x = 0; x < m_MaskingMap.info.width; x++)
+  {
+      for(int y = 0; y < m_MaskingMap.info.height; y++)
+      {
+          int index = y * m_MaskingMap.info.width + x;
+          if(m_MaskingMap.data[index] != homer_mapnav_msgs::ModifyMap::NOT_MASKED)
+          {
+            mapPoint tmp;
+            tmp.x = x; 
+            tmp.y = y;
+            tmp.value = m_MaskingMap.data[index];
+            m_modified_points.push_back(tmp);
+          }
+      }
+  }
 }
 
 void MaskingManager::applyMasking(nav_msgs::OccupancyGrid& map)

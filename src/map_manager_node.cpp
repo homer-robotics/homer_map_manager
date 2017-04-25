@@ -29,6 +29,8 @@ MapManagerNode::MapManagerNode(ros::NodeHandle* nh)
 
   m_MaskingManager = new MaskingManager(mapInfo);
 
+  m_MapManager->updateMaskingManager(m_MaskingManager);
+
   // subscriptions of MapManagerModule
   m_RapidMapSubscriber = nh->subscribe("/rapid_mapping/map", 1,
                                        &MapManagerNode::callbackRapidMap, this);
