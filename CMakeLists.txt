@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(homer_map_manager)
 set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
-find_package(catkin REQUIRED COMPONENTS roscpp roslib tf homer_mapnav_msgs homer_nav_libs cmake_modules std_srvs)
+find_package(catkin REQUIRED COMPONENTS roscpp roslib tf homer_mapnav_msgs homer_nav_libs cmake_modules std_srvs interactive_markers)
 
 find_package( Eigen3 REQUIRED )
 
@@ -54,6 +54,7 @@ catkin_package(
 		homer_mapnav_msgs
 		homer_nav_libs
 		std_srvs
+        interactive_markers
 	LIBRARIES homerImage_io homerManagers
 )
 
@@ -70,6 +71,11 @@ add_dependencies(
 	map_manager
 		${catkin_EXPORTED_TARGETS}
 )
+
+add_executable(poi_visualization src/poi_visualization.cpp)
+
+target_link_libraries(poi_visualization ${catkin_LIBRARIES})
+
 
 install(DIRECTORY include/${PROJECT_NAME}/
 	DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
