@@ -66,15 +66,11 @@ target_link_libraries(
 		homerManagers
 		homerImage_io
 )
-
-add_dependencies(
-	map_manager
-		${catkin_EXPORTED_TARGETS}
-)
+add_dependencies( map_manager ${catkin_EXPORTED_TARGETS})
 
 add_executable(poi_visualization src/poi_visualization.cpp)
-
 target_link_libraries(poi_visualization ${catkin_LIBRARIES})
+add_dependencies(poi_visualization ${catkin_EXPORTED_TARGETS})
 
 
 install(DIRECTORY include/${PROJECT_NAME}/
