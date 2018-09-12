@@ -467,22 +467,6 @@ int main(int argc, char** argv)
   MapManagerNode node(&nh);
 
   ros::Rate loop_rate(10);
-  while (ros::ok())
-  {
-    try
-    {
-      ros::spinOnce();
-      loop_rate.sleep();
-    }
-    catch (exception& e)
-    {
-      std::cout << "Exception in main loop" << e.what() << std::endl;
-    }
-  }
-  /*    if (pprofile)
-      {
-          ProfilerStop();
-      }
-  */
+  ros::spin();
   return 0;
 }
