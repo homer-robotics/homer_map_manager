@@ -33,7 +33,7 @@ set(Managers_SRC
 )
 
 add_library(homerManagers ${Managers_SRC})
-target_link_libraries(homerManagers homerImage_io)
+target_link_libraries(homerManagers homerImage_io -lstdc++fs)
 add_dependencies(homerManagers ${catkin_EXPORTED_TARGETS})
 
 

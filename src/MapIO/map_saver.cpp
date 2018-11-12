@@ -32,6 +32,7 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <experimental/filesystem>
 
 #include <tf/tf.h>
 
@@ -87,33 +88,35 @@ void MapGenerator::save(
     std::vector<homer_mapnav_msgs::PointOfInterest> poiList,
     std::vector<homer_mapnav_msgs::RegionOfInterest> roiList)
 {
-  if (access(m_Mapname.c_str(), W_OK) != (-1))
-  {
-    // Map "Directory" is an accessible File
-    size_t sp = m_Mapname.rfind('/');
-    m_Mapname = m_Mapname.substr(0, sp);
-  }
-  size_t a = m_Mapname.rfind('/');
-  std::string filename = "";
-  if (a == std::string::npos)
-  {
-    filename = m_Mapname;
-  }
-  else
-  {
-    filename = m_Mapname.substr(a + 1, m_Mapname.size() - 1);
-  }
-  int status;
-  status = mkdir(m_Mapname.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-  std::string SLAMMapdatafile = filename + "_SLAM.pgm";
+    std::experimental::filesystem::path directory;
+    std::experimental::filesystem::path file;
+    directory = std::experimental::filesystem::path(m_Mapname);
+
+    if (!(directory.filename() == "."))
+    {
+        file = directory / directory.filename();
+    }
+    else
+    {
+        auto temp = directory;
+        temp.remove_filename();
+        file = directory / temp.filename();
+    }
+
+    if (!std::experimental::filesystem::is_directory(directory))
+    {
+        std::experimental::filesystem::create_directories(directory);
+    }
+
+  std::string SLAMMapdatafile = std::string(file.filename().c_str()) + "_SLAM.pgm";
   std::string maskingMapdatafile = "";
   saveMapLayer(SLAMMap, m_Mapname + "/" + SLAMMapdatafile);
   if (maskingMap != NULL)
   {
-    maskingMapdatafile = filename + "_mask.pgm";
+    maskingMapdatafile = std::string(file.filename().c_str()) + "_mask.pgm";
     saveMapLayer(maskingMap, m_Mapname + "/" + maskingMapdatafile);
   }
-  std::string mapmetadatafile = m_Mapname + "/" + filename + ".yaml";
+  std::string mapmetadatafile = m_Mapname + "/" + file.filename().c_str() + ".yaml";
   ROS_INFO("Writing map metadata to %s", mapmetadatafile.c_str());
   FILE* yaml = fopen(mapmetadatafile.c_str(), "w");
 
