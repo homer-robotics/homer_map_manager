@@ -105,7 +105,11 @@ void MapGenerator::save(
 
     if (!std::experimental::filesystem::is_directory(directory))
     {
-        std::experimental::filesystem::create_directories(directory);
+        if(!std::experimental::filesystem::create_directories(directory))
+        {
+            ROS_ERROR("The map could not be saved under requested directory.");
+            return;
+        }
     }
 
   std::string SLAMMapdatafile = std::string(file.filename().c_str()) + "_SLAM.pgm";
