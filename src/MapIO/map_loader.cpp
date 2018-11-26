@@ -66,11 +66,13 @@ MapServer::MapServer(const std::string fname, bool& success)
   }
   if(std::experimental::filesystem::is_directory(filepath))
   {
-      std::experimental::filesystem::path extendedpath = filepath / filepath.filename() / ".yaml"; //filename fehlt noch
+      std::experimental::filesystem::path extendedpath = filepath / filepath.filename();
+      extendedpath.replace_extension("yaml");
       if(std::experimental::filesystem::exists(extendedpath))
           filepath = extendedpath;
       else
       {
+          std::cout << extendedpath.generic_string() << std::endl;
         ROS_ERROR("Map_server could not open %s.", fname.c_str());
         return;
       }
@@ -144,7 +146,7 @@ MapServer::MapServer(const std::string fname, bool& success)
     if (slammapfname[0] != '/')
     {
       // dirname can modify what you pass it
-      slammapfname = (filepath / slammapfname).generic_string();
+      slammapfname = (filepath.parent_path() / slammapfname).generic_string();
     }
   }
   catch (YAML::InvalidScalar)
@@ -165,7 +167,7 @@ MapServer::MapServer(const std::string fname, bool& success)
     if (maskingmapfname[0] != '/')
     {
       //              // dirname can modify what you pass it
-      maskingmapfname = (filepath / maskingmapfname).generic_string();
+      maskingmapfname = (filepath.parent_path() / maskingmapfname).generic_string();
     }
   }
 
