@@ -72,7 +72,6 @@ MapServer::MapServer(const std::string fname, bool& success)
           filepath = extendedpath;
       else
       {
-          std::cout << extendedpath.generic_string() << std::endl;
         ROS_ERROR("Map_server could not open %s.", fname.c_str());
         return;
       }
