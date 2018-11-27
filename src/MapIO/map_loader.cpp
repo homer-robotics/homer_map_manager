@@ -128,7 +128,6 @@ MapServer::MapServer(const std::string fname, bool& success)
   try
   {
     slammapfname = doc["image"].as<std::string>();
-    // TODO: make this path-handling more robust
     if (slammapfname.size() == 0)
     {
       ROS_ERROR("The image tag cannot be an empty string.");
@@ -136,7 +135,6 @@ MapServer::MapServer(const std::string fname, bool& success)
     }
     if (slammapfname[0] != '/')
     {
-      // dirname can modify what you pass it
       slammapfname = (filepath.parent_path() / slammapfname).generic_string();
     }
   }
@@ -149,7 +147,6 @@ MapServer::MapServer(const std::string fname, bool& success)
   if (doc["mask_image"])
   {
     maskingmapfname = doc["mask_image"].as<std::string>();
-    // TODO: make this path-handling more robust
     if (maskingmapfname.size() == 0)
     {
       ROS_ERROR("The image tag cannot be an empty string.");
@@ -157,7 +154,6 @@ MapServer::MapServer(const std::string fname, bool& success)
     }
     if (maskingmapfname[0] != '/')
     {
-      //              // dirname can modify what you pass it
       maskingmapfname = (filepath.parent_path() / maskingmapfname).generic_string();
     }
   }
