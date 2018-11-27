@@ -55,8 +55,6 @@ MapServer::MapServer(const std::string fname, bool& success)
   double res, occ_th, free_th;
   std::string frame_id;
   frame_id = "map";
-  // mapfname = fname + ".pgm";
-  // std::ifstream fin((fname + ".yaml").c_str());
 
   std::experimental::filesystem::path filepath(fname);
   if(!std::experimental::filesystem::exists(filepath))
@@ -76,12 +74,6 @@ MapServer::MapServer(const std::string fname, bool& success)
         return;
       }
   }
-//  std::ifstream fin(fname.c_str());
-//  if (fin.fail())
-//  {
-//    ROS_ERROR("Map_server could not open %s.", fname.c_str());
-//    return;
-//  }
 
   YAML::Node doc = YAML::LoadFile(filepath.generic_string());
 
