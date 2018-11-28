@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
+#include <experimental/filesystem>
 
 #include <homer_map_manager/MapIO/image_loader.h>
 #include "nav_msgs/MapMetaData.h"
@@ -54,16 +55,27 @@ MapServer::MapServer(const std::string fname, bool& success)
   double res, occ_th, free_th;
   std::string frame_id;
   frame_id = "map";
-  // mapfname = fname + ".pgm";
-  // std::ifstream fin((fname + ".yaml").c_str());
-  std::ifstream fin(fname.c_str());
-  if (fin.fail())
+
+  std::experimental::filesystem::path filepath(fname);
+  if(!std::experimental::filesystem::exists(filepath))
   {
     ROS_ERROR("Map_server could not open %s.", fname.c_str());
     return;
   }
+  if(std::experimental::filesystem::is_directory(filepath))
+  {
+      std::experimental::filesystem::path extendedpath = filepath / filepath.filename();
+      extendedpath.replace_extension("yaml");
+      if(std::experimental::filesystem::exists(extendedpath))
+          filepath = extendedpath;
+      else
+      {
+        ROS_ERROR("Map_server could not open %s.", fname.c_str());
+        return;
+      }
+  }
 
-  YAML::Node doc = YAML::LoadFile(fname);
+  YAML::Node doc = YAML::LoadFile(filepath.generic_string());
 
   try
   {
@@ -116,7 +128,6 @@ MapServer::MapServer(const std::string fname, bool& success)
   try
   {
     slammapfname = doc["image"].as<std::string>();
-    // TODO: make this path-handling more robust
     if (slammapfname.size() == 0)
     {
       ROS_ERROR("The image tag cannot be an empty string.");
@@ -124,10 +135,7 @@ MapServer::MapServer(const std::string fname, bool& success)
     }
     if (slammapfname[0] != '/')
     {
-      // dirname can modify what you pass it
-      char* fname_copy = strdup(fname.c_str());
-      slammapfname = std::string(dirname(fname_copy)) + '/' + slammapfname;
-      free(fname_copy);
+      slammapfname = (filepath.parent_path() / slammapfname).generic_string();
     }
   }
   catch (YAML::InvalidScalar)
@@ -139,7 +147,6 @@ MapServer::MapServer(const std::string fname, bool& success)
   if (doc["mask_image"])
   {
     maskingmapfname = doc["mask_image"].as<std::string>();
-    // TODO: make this path-handling more robust
     if (maskingmapfname.size() == 0)
     {
       ROS_ERROR("The image tag cannot be an empty string.");
@@ -147,11 +154,7 @@ MapServer::MapServer(const std::string fname, bool& success)
     }
     if (maskingmapfname[0] != '/')
     {
-      //              // dirname can modify what you pass it
-      char* fname_copy = strdup(fname.c_str());
-      maskingmapfname =
-          std::string(dirname(fname_copy)) + '/' + maskingmapfname;
-      free(fname_copy);
+      maskingmapfname = (filepath.parent_path() / maskingmapfname).generic_string();
     }
   }
 
