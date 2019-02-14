@@ -100,6 +100,9 @@ MapManagerNode::MapManagerNode(ros::NodeHandle* nh)
   m_LoadedMapPublisher =
       nh->advertise<nav_msgs::OccupancyGrid>("/map_manager/loaded_map", 1);
 
+  m_LoadedMapPublisher =
+      nh->advertise<std_msgs::Empty>("/map_manager/loading_map_finished", 1);
+
   // mask slam publisher
   m_MaskSlamMapPublisher =
       nh->advertise<nav_msgs::OccupancyGrid>("/map_manager/mask_slam", 1);
@@ -242,6 +245,8 @@ void MapManagerNode::callbackLoadMap(const std_msgs::String::ConstPtr& msg)
     m_POIManager->broadcastPoiList();
     m_ROIManager->replaceROIList(map_loader.getRois());
     m_ROIManager->broadcastRoiList();
+
+    m_LoadingMapFinishedPublisher.publish(std_msgs::Empty());
   }
   else
   {
