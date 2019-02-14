@@ -133,6 +133,8 @@ private:
   /** publisher for loaded maps */
   ros::Publisher m_LoadedMapPublisher;
 
+  ros::Publisher m_LoadingMapFinishedPublisher;
+
   /** publisher to mask slam map */
   ros::Publisher m_MaskSlamMapPublisher;
 
