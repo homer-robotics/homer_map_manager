@@ -242,12 +242,12 @@ void MapManagerNode::callbackLoadMap(const std_msgs::String::ConstPtr& msg)
                                    maskingMap);
     }
 
-    m_LoadingMapFinishedPublisher.publish(std_msgs::Empty());
-
     m_POIManager->replacePOIList(map_loader.getPois());
     m_POIManager->broadcastPoiList();
     m_ROIManager->replaceROIList(map_loader.getRois());
     m_ROIManager->broadcastRoiList();
+    m_LoadingMapFinishedPublisher.publish(std_msgs::Empty());
+
   }
   else
   {
