@@ -229,6 +229,7 @@ void MapManagerNode::callbackLoadMap(const std_msgs::String::ConstPtr& msg)
     {
       poll_rate.sleep();
     }
+
     m_LoadedMapPublisher.publish(map_loader.getSLAMMap());
     m_MapManager->updateMapLayer(
         homer_mapnav_msgs::MapLayers::SLAM_LAYER,
@@ -236,6 +237,7 @@ void MapManagerNode::callbackLoadMap(const std_msgs::String::ConstPtr& msg)
     nav_msgs::OccupancyGrid::ConstPtr maskingMap =
         boost::make_shared<nav_msgs::OccupancyGrid>(map_loader.getMaskingMap());
     m_MaskingManager->replaceMap(map_loader.getMaskingMap());
+
     if (maskingMap->data.size() != 0)
     {
       m_MapManager->updateMapLayer(homer_mapnav_msgs::MapLayers::MASKING_LAYER,
@@ -246,8 +248,11 @@ void MapManagerNode::callbackLoadMap(const std_msgs::String::ConstPtr& msg)
     m_POIManager->broadcastPoiList();
     m_ROIManager->replaceROIList(map_loader.getRois());
     m_ROIManager->broadcastRoiList();
+    while (m_LoadingMapFinishedPublisher.getNumSubscribers() == 0)
+    {
+      poll_rate.sleep();
+    }
     m_LoadingMapFinishedPublisher.publish(std_msgs::Empty());
-
   }
   else
   {
@@ -442,10 +447,12 @@ bool MapManagerNode::loadMapService(homer_mapnav_msgs::LoadMap::Request& req,
     std_msgs::String::Ptr mapfileMsg(new std_msgs::String);
     mapfileMsg->data = mapfile;
     callbackLoadMap(mapfileMsg);
+    return true;
   }
   else
   {
     ROS_ERROR_STREAM("Map filename is empty. Could not load map");
+    return false;
   }
 }
 
