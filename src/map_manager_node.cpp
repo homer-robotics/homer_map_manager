@@ -463,6 +463,7 @@ bool MapManagerNode::resetMapService(std_srvs::Empty::Request& req,
   nav_msgs::OccupancyGrid::ConstPtr maskingMap = m_MaskingManager->resetMap();
   m_MapManager->updateMapLayer(homer_mapnav_msgs::MapLayers::MASKING_LAYER,
                                maskingMap);
+  return true;
 }
 
 int main(int argc, char** argv)
