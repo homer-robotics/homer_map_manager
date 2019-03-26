@@ -102,6 +102,26 @@ void MapManager::sendMergedMap()
           }
         }
       }
+      else if( mapresolution == mergedMap.info.resolution )
+      {
+        const double mapOriginX = m_MapLayers[m_map_layers[j]]->info.origin.position.x;
+        const double mapOriginY = m_MapLayers[m_map_layers[j]]->info.origin.position.y;
+        signed char currentvalue = 0;
+        for( size_t i = 0; i < mapsize; i++ )
+        {
+          currentvalue = tempdata->at(i);
+          if (currentvalue > 50 || currentvalue == frei)
+          {
+            const size_t x = i % mapwidth;
+            const size_t y = i / mapwidth;
+            const double worldX = mapOriginX + (x - 0.5) * mapresolution;
+            const double worldY = mapOriginY + (y - 0.5) * mapresolution;
+            const size_t mergedX = (worldX - mergedMap.info.origin.position.x) / mapresolution + 0.51;
+            const size_t mergedY = (worldY - mergedMap.info.origin.position.y) / mapresolution + 0.51;
+            mergedMap.data[mergedX + mergedY * mergedMap.info.width] = currentvalue;
+          }
+        }
+      }
     }
   }
   mergedMap.header.stamp = ros::Time::now();
