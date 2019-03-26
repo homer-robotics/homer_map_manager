@@ -60,7 +60,6 @@ void MapManager::sendMergedMap()
     ROS_DEBUG_STREAM("SLAM map is missing!");
     return;
   }
-  int k;
   nav_msgs::OccupancyGrid mergedMap(
       *(m_MapLayers[homer_mapnav_msgs::MapLayers::SLAM_LAYER]));
 
