@@ -78,18 +78,28 @@ void MapManager::sendMergedMap()
     if (m_MapLayers.find(m_map_layers[j]) != m_MapLayers.end() &&
         m_MapVisibility[m_map_layers[j]])
     {
-      size_t mapsize = m_MapLayers[m_map_layers[j]]->info.height *
-                       m_MapLayers[m_map_layers[j]]->info.width;
+      const size_t mapheight =
+        m_MapLayers[m_map_layers[j]]->info.height;
+      const size_t mapwidth =
+        m_MapLayers[m_map_layers[j]]->info.width;
+      const double mapresolution =
+        m_MapLayers[m_map_layers[j]]->info.resolution;
+      const size_t mapsize = mapheight * mapwidth;
       const std::vector<signed char> *tempdata =
-          &m_MapLayers[m_map_layers[j]]->data;
+        &m_MapLayers[m_map_layers[j]]->data;
       const int frei = homer_mapnav_msgs::ModifyMap::FREE;
-      signed char currentvalue = 0;
-      for (int i = 0; i < mapsize; i++)
+      if( mapheight == mergedMap.info.height &&
+          mapwidth == mergedMap.info.width &&
+          mapresolution == mergedMap.info.resolution )
       {
-        currentvalue = tempdata->at(i);
-        if (currentvalue > 50 || currentvalue == frei)
+        signed char currentvalue = 0;
+        for (size_t i = 0; i < mapsize; i++)
         {
-          mergedMap.data[i] = currentvalue;
+          currentvalue = tempdata->at(i);
+          if (currentvalue > 50 || currentvalue == frei)
+          {
+            mergedMap.data[i] = currentvalue;
+          }
         }
       }
     }
