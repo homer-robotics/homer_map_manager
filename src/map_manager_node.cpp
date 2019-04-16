@@ -227,6 +227,7 @@ void MapManagerNode::callbackLoadMap(const std_msgs::String::ConstPtr& msg)
     ros::Rate poll_rate(10);
     while (m_LoadedMapPublisher.getNumSubscribers() == 0)
     {
+      ROS_INFO_STREAM("map_manager waiting for subscribers...");
       poll_rate.sleep();
     }
 
@@ -248,16 +249,21 @@ void MapManagerNode::callbackLoadMap(const std_msgs::String::ConstPtr& msg)
     m_POIManager->broadcastPoiList();
     m_ROIManager->replaceROIList(map_loader.getRois());
     m_ROIManager->broadcastRoiList();
+
+    /*
     while (m_LoadingMapFinishedPublisher.getNumSubscribers() == 0)
     {
+      ROS_INFO_STREAM("map_manager waiting again for subscribers...");
       poll_rate.sleep();
     }
+    */
     m_LoadingMapFinishedPublisher.publish(std_msgs::Empty());
   }
   else
   {
     ROS_ERROR_STREAM("[MapManager] Could not open mapfile!!");
   }
+  ROS_INFO_STREAM("Finished loadMapCallback.");
 }
 
 void MapManagerNode::callbackAddPOI(
