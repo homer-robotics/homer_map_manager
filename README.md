@@ -1,42 +1,32 @@
-# map_manager
-
-## Known Issues / Todo's 
-
-Aus bisher ungeklärten Gründen kann es in seltenen Fällen passieren, dass der map_manager die Verbindung zum roscore verliert. In diesem Fall muss er durch rosrun map_manager map_manager neugestartet werden.
-
+# homer_map_manager
 
 ## Introduction 
 
-Der map_manager ist der Mittelpunkt der Kommunikation zwischen homer_mapping, homer_navigation, GUI und die Spiel-Nodes.
-Das Zusammenspiel dieser Nodes ist im Screenshot des rqt_graphs zu sehen.
+The map_manager is the center of communication between homer_mapping and homer_navigation
+The interaction of these nodes can be seen in the screenshot of the rqt_graph.
 
-![rqt_graph](images/rosgraph.png)
-
-Er verwaltet die aktuell durch das mapping erstellte Karte sowie weitere Kartebenen. Aktuell sind das die SLAM-Karte, die aktuellen Laserdaten in einer weiteren Ebene und eine Masking-Ebene, in der mit Hilfe der GUI Hindernisse oder freie Flächen in die Karte gezeichnet werden können.
-Jedes mal, wenn eine SLAM-Karte von der mapping-Node geschickt wird, wird diese mit allen anderen Karteneben überschrieben (in der Reihenfolge SLAM, Masking, Laserdaten) und als eine zusammengefügte Karte versendet.
-Zudem verwaltet der map_manager alle erstellten Points Of Interest (POIs), die z.B. als Ziele für die Navigation verwendet werden.
-Die Node ist außerdem zuständig für das Speichern und Laden der Kartenebenen und der POIs. Dabei wird die SLAM-Ebene sowie die Masking-Ebene berücksichtigt.
-
-
+It manages the map currently created by the mapping as well as other map layers. Currently these are the SLAM map, the current laser data in a further layer and a masking layer in which obstacles or free areas can be drawn into the map with the help of the GUI.
+Each time a SLAM map is sent from the mapping node, it is overwritten with all other map layers (in the order SLAM, masking, laser data) and sent as a merged map.
+In addition, map_manager manages all created Points of Interest (POIs), which are used, for example, as destinations for navigation.
+The node is also responsible for saving and loading map layers and POIs. The SLAM level and the masking level are taken into account.
 
 ## Topics 
 
-
 #### Publisher 
-* `/map`: Die aktuelle Karte, die aus allen aktivierten Kartenebenen zusammengesetzt ist. Diese wird in der GUI angezeigt und für die Navigation verwendet.
-* `/map_manager/poi_list`: Verschickt einen Vektor mit allen aktuellen POIs. Dieser Publisher wird immer ausgelöst, sobald sich ein POI ändert oder ein neuer hinzugefügt wird.
-* `/map_manager/loaded_map`: Wenn eine Karte geladen wird, wird über dieses Topic die geladene SLAM-Ebene an die homer_mapping-Node verschickt.
-* `/map_manager/mask_slam`: Über die GUI kann die SLAM-Map verändert werden. Diese Modifizierungen werden über dieses Topic vom map_manager an das homer_mapping versendet.
+* `/map`: The current map composed of all activated map layers. This is displayed in the GUI and used for navigation.
+* `/map_manager/poi_list`: Sends a vector with all current POIs. This Publisher is always triggered when a POI changes or a new one is added.
+* `/map_manager/loaded_map`: When a map is loaded, this topic sends the loaded SLAM layer to the homer_mapping node.
+* `/map_manager/mask_slam`: Via the GUI the SLAM map can be changed. These modifications are sent from the map_manager to the homer_mapping via this topic.
 
 #### Subscriber
 
-* `/homer_mapping/slam_map (nav_msgs/OccupancyGrid)`: Hierüber wird die aktuelle SLAM-Map empfangen.
-* `/map_manager/save_map (map_messages/SaveMap)`: Hierüber wird der Befehl zum Speichern der Karte inklusive des Dateinamens empfangen.
-* `/map_manager/load_map (map_messages/SaveMap)`: Hiermit wird eine Karte geladen und alle bisherigen Kartenebenen durch die geladenen ersetzt.
-* `/map_manager/toggle_map_visibility (map_messages/MapLayers)`: Hierüber können einzelne Kartenebenen aktiviert beziehungsweise deaktiviert werden. Deaktivierte werden nicht mehr beim Zusammenfügen der Karte berücksichtigt und dementsprechend auch nicht in der GUI angezeigt sowie für die Navigation verwendet.
-* `/scan (nav_msgs/LaserScan)`: Der aktuelle Laserscan, der in die Laserscan-Ebene gezeichnet wird.
-* `/map_manager/add_POI (map_messages/PointOfInterest)`: Hierüber kann ein POI hinzugefügt werden.
-* `/map_manager/modify_POI (map_messages/ModifyPOI)`: Hierüber kann ein vorhandener POI verändert werden (Name, Position,...)
-* `/map_manager/delete_POI (map_messages/DeletePointOfInterest)`: Hierüber kann ein vorhander POI gelöscht werden.
-* `/map_manager/modify_map (map_messages/ModifyMap)`: Über dieses Topic werden die Koordinaten der Polygone verschickt, die über die GUI maskiert wurden. Außerdem wird die Kartenebene mitgeteilt, die verändet werden soll (SLAM oder Masking-Ebene).
-* `/map_manager/reset_maps (std_msgs/Empty)`: Hierüber werden alle Kartenebenen zurückgesetzt.
+* `/homer_mapping/slam_map (nav_msgs/OccupancyGrid)`: This will receive the current SLAM map.
+* `/map_manager/save_map (map_messages/SaveMap)`: Receives the command to save the map including the file name.
+* `/map_manager/load_map (map_messages/SaveMap)`: Loads a map and replaces all previous map layers with the loaded ones.
+* `/map_manager/toggle_map_visibility (map_messages/MapLayers)`: This option activates or deactivates individual map layers. Deactivated map layers are no longer taken into account when merging the map and are therefore not displayed in the GUI or used for navigation.
+* `/scan (nav_msgs/LaserScan)`: The current laser scan drawn into the laser scan layer.
+* `/map_manager/add_POI (map_messages/PointOfInterest)`: This can be used to add a POI.
+* `/map_manager/modify_POI (map_messages/ModifyPOI)`: With this you can change an existing POI (Name, Position,...)
+* `/map_manager/delete_POI (map_messages/DeletePointOfInterest)`: This can be used to delete an existing POI.
+* `/map_manager/modify_map (map_messages/ModifyMap)`: This topic is used to send the coordinates of the polygons that have been masked via the GUI. The map layer to be modified (SLAM or masking layer) is also specified.
+* `/map_manager/reset_maps (std_msgs/Empty)`: This will reset all map layers.
